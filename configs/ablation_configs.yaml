@@ -1,0 +1,34 @@
+feature_sets:
+  application_only:
+    include_tables:
+      - application
+  with_bureau:
+    include_tables:
+      - application
+      - bureau
+      - bureau_balance
+  with_previous_application:
+    include_tables:
+      - application
+      - previous_application
+  with_pos_cash:
+    include_tables:
+      - application
+      - POS_CASH_balance
+  with_credit_card:
+    include_tables:
+      - application
+      - credit_card_balance
+  with_installments:
+    include_tables:
+      - application
+      - installments_payments
+  full_features:
+    include_tables:
+      - application
+      - bureau
+      - bureau_balance
+      - previous_application
+      - POS_CASH_balance
+      - credit_card_balance
+      - installments_payments

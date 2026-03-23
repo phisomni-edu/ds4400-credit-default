@@ -1,0 +1,34 @@
+logistic_regression:
+  class: LogisticRegression
+  params:
+    max_iter: 1000
+    class_weight: balanced
+
+random_forest:
+  class: RandomForestClassifier
+  params:
+    n_estimators: 300
+    max_depth: 12
+    min_samples_leaf: 5
+    n_jobs: -1
+    class_weight: balanced_subsample
+
+lightgbm:
+  class: LGBMClassifier
+  params:
+    n_estimators: 500
+    learning_rate: 0.05
+    num_leaves: 64
+    subsample: 0.8
+    colsample_bytree: 0.8
+
+neural_net:
+  class: MLP
+  params:
+    hidden_dims:
+      - 256
+      - 128
+    dropout: 0.2
+    batch_size: 1024
+    epochs: 20
+    learning_rate: 0.001
