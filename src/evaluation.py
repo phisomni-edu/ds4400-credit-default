@@ -1,7 +1,5 @@
 """Evaluation helpers for fold-level model comparison."""
 
-from __future__ import annotations
-
 import pandas as pd
 from sklearn.metrics import (
     accuracy_score,
@@ -29,7 +27,7 @@ def evaluate_predictions(y_true, y_score, threshold=0.5):
 
 
 def make_fold_record(model_name, experiment_name, fold_index, metrics, extra_fields=None):
-    record={
+    record = {
         "model": model_name,
         "experiment": experiment_name,
         "fold": fold_index,

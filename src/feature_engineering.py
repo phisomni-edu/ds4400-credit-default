@@ -48,7 +48,7 @@ def _status_count(column, value, alias):
 
 
 def _numeric_aggs(columns, prefix):
-    expressions: list[pl.Expr] = []
+    expressions = []
     for column in columns:
         expressions.extend(
             [

@@ -35,22 +35,13 @@ def compare_paired_models(results_df, left_model, right_model, metric="roc_auc",
         .dropna()
     )
 
-    if left_model not in paired.columns or right_model not in paired.columns:
-        raise ValueError("Both models must be present on the same folds for paired comparison.")
-
     left = paired[left_model]
     right = paired[right_model]
     differences = left - right
     n = int(len(differences))
 
-    if n < 2:
-        raise ValueError("At least two shared folds are required for a paired statistical test.")
-
     t_stat, t_pvalue = stats.ttest_rel(left, right)
-    try:
-        w_stat, w_pvalue = stats.wilcoxon(left, right, zero_method="wilcox")
-    except ValueError:
-        w_stat, w_pvalue = float("nan"), float("nan")
+    w_stat, w_pvalue = stats.wilcoxon(left, right, zero_method="wilcox")
 
     std = float(differences.std(ddof=1))
     effect_size = float(differences.mean() / std) if std else 0.0
@@ -75,7 +66,6 @@ def compare_paired_models(results_df, left_model, right_model, metric="roc_auc",
 
 
 def compare_all_model_pairs(results_df, metric="roc_auc", experiment=None):
-
     filtered = results_df if experiment is None else results_df.loc[results_df["experiment"] == experiment]
     models = sorted(filtered["model"].dropna().unique().tolist())
 
