@@ -1,0 +1,35 @@
+random_seed: 42
+
+cross_validation:
+  strategy: stratified_kfold
+  n_splits: 5
+  shuffle: true
+  random_state: 42
+
+evaluation:
+  primary_metric: roc_auc
+  ranking_metrics:
+    - roc_auc
+    - average_precision
+  threshold_metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1
+  save_fold_level_results: true
+
+significance_testing:
+  enabled: true
+  paired_tests:
+    - paired_t_test
+    - wilcoxon_signed_rank
+  alpha: 0.05
+  compare_on: roc_auc
+  use_shared_folds_only: true
+
+interpretability:
+  primary_method: shap
+  logistic_regression:
+    standardize_numeric_features: true
+    coefficient_usage: directional_only
+    note: Coefficients should not be treated as global feature importance without scale control.

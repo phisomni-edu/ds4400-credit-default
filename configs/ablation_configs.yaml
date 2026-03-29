@@ -1,34 +1,107 @@
-feature_sets:
+feature_groups:
+  application:
+    description: Main application table features only.
+    tables:
+      - application
+  bureau_family:
+    description: Bureau records combined with bureau balance history.
+    tables:
+      - bureau
+      - bureau_balance
+  previous_application:
+    description: Historical Home Credit application records.
+    tables:
+      - previous_application
+  pos_cash:
+    description: Point-of-sale and cash balance history.
+    tables:
+      - POS_CASH_balance
+  credit_card:
+    description: Credit card balance history.
+    tables:
+      - credit_card_balance
+  installments:
+    description: Installment payment history.
+    tables:
+      - installments_payments
+
+experiments:
   application_only:
-    include_tables:
+    include_groups:
       - application
-  with_bureau:
-    include_tables:
+  app_plus_bureau_family:
+    include_groups:
       - application
-      - bureau
-      - bureau_balance
-  with_previous_application:
-    include_tables:
+      - bureau_family
+  app_plus_previous_application:
+    include_groups:
       - application
       - previous_application
-  with_pos_cash:
-    include_tables:
+  app_plus_pos_cash:
+    include_groups:
       - application
-      - POS_CASH_balance
-  with_credit_card:
-    include_tables:
+      - pos_cash
+  app_plus_credit_card:
+    include_groups:
       - application
-      - credit_card_balance
-  with_installments:
-    include_tables:
+      - credit_card
+  app_plus_installments:
+    include_groups:
       - application
-      - installments_payments
+      - installments
   full_features:
-    include_tables:
+    include_groups:
       - application
-      - bureau
-      - bureau_balance
+      - bureau_family
       - previous_application
-      - POS_CASH_balance
-      - credit_card_balance
-      - installments_payments
+      - pos_cash
+      - credit_card
+      - installments
+  full_minus_bureau_family:
+    include_groups:
+      - application
+      - previous_application
+      - pos_cash
+      - credit_card
+      - installments
+  full_minus_previous_application:
+    include_groups:
+      - application
+      - bureau_family
+      - pos_cash
+      - credit_card
+      - installments
+  full_minus_pos_cash:
+    include_groups:
+      - application
+      - bureau_family
+      - previous_application
+      - credit_card
+      - installments
+  full_minus_credit_card:
+    include_groups:
+      - application
+      - bureau_family
+      - previous_application
+      - pos_cash
+      - installments
+  full_minus_installments:
+    include_groups:
+      - application
+      - bureau_family
+      - previous_application
+      - pos_cash
+      - credit_card
+
+analysis:
+  recommended_primary_runs:
+    - application_only
+    - full_features
+    - full_minus_bureau_family
+    - full_minus_previous_application
+    - full_minus_pos_cash
+    - full_minus_credit_card
+    - full_minus_installments
+  notes:
+    - Run ablation on grouped feature families, not individual engineered columns.
+    - Use the same cross-validation splits across all ablation experiments.

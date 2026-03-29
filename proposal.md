@@ -48,10 +48,11 @@ Loan default prediction is important to responsible lending, with poor predictio
 - matplotlib, seaborn (visualization)
 
 **Evaluation and Metrics:**
-- Cross-validation
-- Classification metrics: accuracy, error, precision, recall, AUC-ROC
-- Ablation: Marginal AUC gain per auxiliary table
-- Interpretability: SHAP feature importance rankings, cross-model agreement on top features
+- Stratified cross-validation with shared folds across models
+- Classification metrics: accuracy, error, precision, recall, AUC-ROC, average precision
+- Statistical comparison: paired t-tests or other paired tests on fold-level metrics
+- Ablation: Marginal AUC gain from grouped auxiliary feature families rather than individual engineered features
+- Interpretability: SHAP feature importance rankings, with logistic regression used as a linear baseline rather than a primary importance tool
 
 ---
 
@@ -59,9 +60,9 @@ Loan default prediction is important to responsible lending, with poor predictio
 
 1. A performance comparison across four model families (Logistic Regression, Random Forest, Gradient Boosting, Neural Network), with GB/NN expected to lead on AUC but Logistic Regression providing a strong interpretable baseline.
 
-2. An ablation study quantifying the marginal predictive value of each auxiliary table: identifying which data sources contribute most to default prediction.
+2. An ablation study quantifying the marginal predictive value of each broad auxiliary data family: identifying which data sources contribute most to default prediction without an impractical number of runs.
 
-3. An interpretability analysis using SHAP, comparing whether different model families rely on the same features or surface different risk signals.
+3. An interpretability analysis using SHAP, comparing whether different model families rely on the same features or surface different risk signals, while using logistic regression coefficients only for directional linear interpretation after scaling.
 
 4. A practical recommendation balancing accuracy, interpretability, and data requirements for deployment in a lending context.
 

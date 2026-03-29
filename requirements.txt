@@ -2,6 +2,7 @@ numpy
 pandas
 polars
 pyarrow
+scipy
 scikit-learn
 lightgbm
 torch
@@ -9,3 +10,4 @@ shap
 matplotlib
 seaborn
 pyyaml
+jupyter
