@@ -37,7 +37,7 @@ Loan default prediction is important to responsible lending, with poor predictio
 
 ## Approach and Methodology
 
-**Models:** Logistic Regression, Random Forest, Gradient Boosting, Neural Network
+**Models:** Logistic Regression, Random Forest, Gradient Boosting / LightGBM, Neural Network
 
 **Language and Packages:**
 - Python 3.10+
@@ -47,20 +47,31 @@ Loan default prediction is important to responsible lending, with poor predictio
 - SHAP (interpretability)
 - matplotlib, seaborn (visualization)
 
+**Preprocessing and Experimental Design:**
+- Auxiliary tables are aggregated to the applicant level and merged into a shared tabular feature set.
+- Ablation is performed over broad feature families rather than individual engineered columns, to keep the number of experiments manageable and the conclusions easier to interpret.
+- The main ablation settings will include `application_only`, `full_features`, and `full_minus_<feature_family>` comparisons.
+- The neural network will use the same aggregated tabular features as the other models rather than a separate sequence-based input representation.
+
 **Evaluation and Metrics:**
 - Stratified cross-validation with shared folds across models
 - Classification metrics: accuracy, error, precision, recall, AUC-ROC, average precision
-- Statistical comparison: paired t-tests or other paired tests on fold-level metrics
+- Statistical comparison: paired t-tests or other paired tests on fold-level metrics, so reported differences between models are not based only on mean scores
 - Ablation: Marginal AUC gain from grouped auxiliary feature families rather than individual engineered features
 - Interpretability: SHAP feature importance rankings, with logistic regression used as a linear baseline rather than a primary importance tool
+
+**Interpretability Notes:**
+- Logistic regression is included as an interpretable linear baseline, but not as the main source of feature-importance claims.
+- Because logistic-regression coefficients depend on feature scale, numeric features will be standardized before coefficient inspection.
+- Coefficients will be used mainly for directional interpretation of linear effects, while SHAP will be the main tool for comparing global feature importance across models.
 
 ---
 
 ## Outcome
 
-1. A performance comparison across four model families (Logistic Regression, Random Forest, Gradient Boosting, Neural Network), with GB/NN expected to lead on AUC but Logistic Regression providing a strong interpretable baseline.
+1. A performance comparison across four model families (Logistic Regression, Random Forest, Gradient Boosting / LightGBM, Neural Network), with boosting / neural models expected to lead on AUC and Logistic Regression providing a clear linear baseline.
 
-2. An ablation study quantifying the marginal predictive value of each broad auxiliary data family: identifying which data sources contribute most to default prediction without an impractical number of runs.
+2. An ablation study quantifying the marginal predictive value of each broad auxiliary data family: identifying which data sources contribute most to default prediction without requiring an impractical number of runs.
 
 3. An interpretability analysis using SHAP, comparing whether different model families rely on the same features or surface different risk signals, while using logistic regression coefficients only for directional linear interpretation after scaling.
 
@@ -73,7 +84,7 @@ Loan default prediction is important to responsible lending, with poor predictio
 | Jiaming Liu | Aran Dharma |
 |-------------|-------------|
 | EDA on main table | EDA on auxiliary tables |
-| Feature engineering from auxiliary tables | Sequence preprocessing for neural net |
+| Feature engineering from auxiliary tables | Shared tabular preprocessing for all models |
 | Logistic Regression + Random Forest | LightGBM + Neural Network |
-| SHAP/interpretability analysis | Ablation study (auxiliary table contribution) |
+| SHAP/interpretability analysis | Grouped ablation study (feature-family contribution) |
 | Comparison analysis | |
