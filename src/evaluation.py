@@ -1,11 +1,13 @@
 """Evaluation helpers for fold-level model comparison."""
 
+import numpy as np
 import pandas as pd
 from sklearn.metrics import (
     accuracy_score,
     average_precision_score,
     f1_score,
     precision_score,
+    precision_recall_curve,
     recall_score,
     roc_auc_score,
 )
@@ -24,6 +26,80 @@ def evaluate_predictions(y_true, y_score, threshold=0.5):
         "roc_auc": roc_auc_score(y_true_series, y_score_series),
         "average_precision": average_precision_score(y_true_series, y_score_series),
     }
+
+
+def find_best_threshold(y_true, y_score, metric="f1"):
+    y_true_series = pd.Series(y_true)
+    y_score_series = pd.Series(y_score)
+
+    thresholds = np.arange(0.05, 0.96, 0.01)
+    best_threshold = 0.5
+    best_value = -1.0
+
+    for threshold in thresholds:
+        metrics = evaluate_predictions(y_true_series, y_score_series, threshold=threshold)
+        if metrics[metric] > best_value:
+            best_value = metrics[metric]
+            best_threshold = float(threshold)
+
+    return best_threshold, best_value
+
+
+def evaluate_with_best_f1_threshold(y_true, y_score):
+    best_threshold, best_f1 = find_best_threshold(y_true, y_score, metric="f1")
+    metrics = evaluate_predictions(y_true, y_score, threshold=best_threshold)
+    metrics["threshold"] = best_threshold
+    metrics["best_f1_from_sweep"] = best_f1
+    return metrics
+
+
+def build_threshold_table(y_true, y_score, thresholds=None):
+    if thresholds is None:
+        thresholds = np.arange(0.05, 0.96, 0.05)
+
+    rows = []
+    for threshold in thresholds:
+        metrics = evaluate_predictions(y_true, y_score, threshold=float(threshold))
+        rows.append(
+            {
+                "threshold": float(threshold),
+                **metrics,
+            }
+        )
+
+    return pd.DataFrame(rows)
+
+
+def find_threshold_for_target_precision(y_true, y_score, target_precision=0.30):
+    threshold_table = build_threshold_table(y_true, y_score)
+    eligible = threshold_table[threshold_table["precision"] >= target_precision].copy()
+
+    if not eligible.empty:
+        return (
+            eligible.sort_values(["recall", "f1"], ascending=False)
+            .iloc[0]
+            .to_dict()
+        )
+
+    return threshold_table.sort_values("precision", ascending=False).iloc[0].to_dict()
+
+
+def build_precision_recall_curve_df(y_true, y_score):
+    precision, recall, thresholds = precision_recall_curve(y_true, y_score)
+
+    return pd.DataFrame(
+        {
+            "precision": precision[:-1],
+            "recall": recall[:-1],
+            "threshold": thresholds,
+        }
+    )
+
+
+def blend_probabilities(primary_scores, secondary_scores, primary_weight=0.5):
+    primary_series = pd.Series(primary_scores).reset_index(drop=True)
+    secondary_series = pd.Series(secondary_scores).reset_index(drop=True)
+    return primary_weight * primary_series + (1 - primary_weight) * secondary_series
 
 
 def make_fold_record(model_name, experiment_name, fold_index, metrics, extra_fields=None):
