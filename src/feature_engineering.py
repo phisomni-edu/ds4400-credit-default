@@ -222,6 +222,9 @@ def aggregate_pos_cash_features():
             pl.when(pl.col("NAME_CONTRACT_STATUS") == "Active").then(1).otherwise(0).alias("POS_ACTIVE_FLAG"),
             pl.when(pl.col("NAME_CONTRACT_STATUS") == "Completed").then(1).otherwise(0).alias("POS_COMPLETED_FLAG"),
             pl.when(pl.col("NAME_CONTRACT_STATUS") == "Signed").then(1).otherwise(0).alias("POS_SIGNED_FLAG"),
+            pl.when(pl.col("SK_DPD") > 0).then(1).otherwise(0).alias("POS_DPD_FLAG"),
+            pl.when(pl.col("SK_DPD") >= 30).then(1).otherwise(0).alias("POS_DPD_30_FLAG"),
+            pl.when(pl.col("SK_DPD_DEF") > 0).then(1).otherwise(0).alias("POS_DPD_DEF_FLAG"),
         ]
     )
 
@@ -232,6 +235,12 @@ def aggregate_pos_cash_features():
             pl.col("POS_ACTIVE_FLAG").sum().alias("POS_ACTIVE_COUNT"),
             pl.col("POS_COMPLETED_FLAG").sum().alias("POS_COMPLETED_COUNT"),
             pl.col("POS_SIGNED_FLAG").sum().alias("POS_SIGNED_COUNT"),
+            pl.col("POS_DPD_FLAG").sum().alias("POS_DPD_COUNT"),
+            pl.col("POS_DPD_FLAG").mean().alias("POS_DPD_RATE"),
+            pl.col("POS_DPD_30_FLAG").sum().alias("POS_DPD_30_COUNT"),
+            pl.col("POS_DPD_30_FLAG").mean().alias("POS_DPD_30_RATE"),
+            pl.col("POS_DPD_DEF_FLAG").sum().alias("POS_DPD_DEF_COUNT"),
+            pl.col("POS_DPD_DEF_FLAG").mean().alias("POS_DPD_DEF_RATE"),
             *_numeric_aggs(
                 [
                     "MONTHS_BALANCE",
@@ -257,6 +266,9 @@ def aggregate_credit_card_features():
             pl.when(pl.col("NAME_CONTRACT_STATUS") == "Active").then(1).otherwise(0).alias("CC_ACTIVE_FLAG"),
             pl.when(pl.col("NAME_CONTRACT_STATUS") == "Completed").then(1).otherwise(0).alias("CC_COMPLETED_FLAG"),
             pl.when(pl.col("NAME_CONTRACT_STATUS") == "Signed").then(1).otherwise(0).alias("CC_SIGNED_FLAG"),
+            pl.when(pl.col("SK_DPD") > 0).then(1).otherwise(0).alias("CC_DPD_FLAG"),
+            pl.when(pl.col("SK_DPD") >= 30).then(1).otherwise(0).alias("CC_DPD_30_FLAG"),
+            pl.when(pl.col("SK_DPD_DEF") > 0).then(1).otherwise(0).alias("CC_DPD_DEF_FLAG"),
         ]
     )
 
@@ -267,6 +279,12 @@ def aggregate_credit_card_features():
             pl.col("CC_ACTIVE_FLAG").sum().alias("CC_ACTIVE_COUNT"),
             pl.col("CC_COMPLETED_FLAG").sum().alias("CC_COMPLETED_COUNT"),
             pl.col("CC_SIGNED_FLAG").sum().alias("CC_SIGNED_COUNT"),
+            pl.col("CC_DPD_FLAG").sum().alias("CC_DPD_COUNT"),
+            pl.col("CC_DPD_FLAG").mean().alias("CC_DPD_RATE"),
+            pl.col("CC_DPD_30_FLAG").sum().alias("CC_DPD_30_COUNT"),
+            pl.col("CC_DPD_30_FLAG").mean().alias("CC_DPD_30_RATE"),
+            pl.col("CC_DPD_DEF_FLAG").sum().alias("CC_DPD_DEF_COUNT"),
+            pl.col("CC_DPD_DEF_FLAG").mean().alias("CC_DPD_DEF_RATE"),
             *_numeric_aggs(
                 [
                     "MONTHS_BALANCE",
@@ -308,6 +326,9 @@ def aggregate_installments_features():
             (pl.col("AMT_INSTALMENT") - pl.col("AMT_PAYMENT")).alias("INST_PAYMENT_DIFF"),
             (pl.col("DAYS_ENTRY_PAYMENT") - pl.col("DAYS_INSTALMENT")).clip(lower_bound=0).alias("INST_DPD"),
             (pl.col("DAYS_INSTALMENT") - pl.col("DAYS_ENTRY_PAYMENT")).clip(lower_bound=0).alias("INST_DBD"),
+            pl.when((pl.col("DAYS_ENTRY_PAYMENT") - pl.col("DAYS_INSTALMENT")) > 0).then(1).otherwise(0).alias("INST_LATE_FLAG"),
+            pl.when((pl.col("DAYS_ENTRY_PAYMENT") - pl.col("DAYS_INSTALMENT")) >= 30).then(1).otherwise(0).alias("INST_LATE_30_FLAG"),
+            pl.when(pl.col("AMT_PAYMENT") < pl.col("AMT_INSTALMENT")).then(1).otherwise(0).alias("INST_UNDERPAY_FLAG"),
         ]
     )
 
@@ -315,6 +336,12 @@ def aggregate_installments_features():
         [
             pl.len().alias("INST_RECORD_COUNT"),
             pl.col("SK_ID_PREV").n_unique().alias("INST_UNIQUE_LOAN_COUNT"),
+            pl.col("INST_LATE_FLAG").sum().alias("INST_LATE_COUNT"),
+            pl.col("INST_LATE_FLAG").mean().alias("INST_LATE_RATE"),
+            pl.col("INST_LATE_30_FLAG").sum().alias("INST_LATE_30_COUNT"),
+            pl.col("INST_LATE_30_FLAG").mean().alias("INST_LATE_30_RATE"),
+            pl.col("INST_UNDERPAY_FLAG").sum().alias("INST_UNDERPAY_COUNT"),
+            pl.col("INST_UNDERPAY_FLAG").mean().alias("INST_UNDERPAY_RATE"),
             *_numeric_aggs(
                 [
                     "NUM_INSTALMENT_VERSION",

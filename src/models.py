@@ -211,6 +211,8 @@ def tune_lightgbm_baseline(
         ascending=False,
     ).reset_index(drop=True)
 
+    best_train_probs = best_model.predict_proba(X_train)[:, 1]
+
     results = {
         "model": "LightGBM",
         **best_metrics,
@@ -219,6 +221,8 @@ def tune_lightgbm_baseline(
     return (
         best_model,
         results,
+        y_train.reset_index(drop=True),
+        pd.Series(best_train_probs),
         y_val.reset_index(drop=True),
         pd.Series(best_probs),
         tuning_results,
@@ -365,6 +369,8 @@ def tune_logistic_regression_baseline(
         ascending=False,
     ).reset_index(drop=True)
 
+    best_train_probs = best_model.predict_proba(X_train)[:, 1]
+
     results = {
         "model": "Logistic Regression",
         **best_metrics,
@@ -373,6 +379,8 @@ def tune_logistic_regression_baseline(
     return (
         best_model,
         results,
+        y_train.reset_index(drop=True),
+        pd.Series(best_train_probs),
         y_val.reset_index(drop=True),
         pd.Series(best_probs),
         tuning_results,
@@ -443,6 +451,8 @@ def tune_random_forest_baseline(
         ascending=False,
     ).reset_index(drop=True)
 
+    best_train_probs = best_model.predict_proba(X_train)[:, 1]
+
     results = {
         "model": "Random Forest",
         **best_metrics,
@@ -451,6 +461,8 @@ def tune_random_forest_baseline(
     return (
         best_model,
         results,
+        y_train.reset_index(drop=True),
+        pd.Series(best_train_probs),
         y_val.reset_index(drop=True),
         pd.Series(best_probs),
         tuning_results,
@@ -583,6 +595,11 @@ def tune_mlp_baseline(
         ascending=False,
     ).reset_index(drop=True)
 
+    best_model.eval()
+    with torch.no_grad():
+        train_logits = best_model(X_train_tensor.to(device))
+        best_train_probs = torch.sigmoid(train_logits).cpu().numpy()
+
     results = {
         "model": "Neural Network",
         **best_metrics,
@@ -592,6 +609,8 @@ def tune_mlp_baseline(
         best_model,
         results,
         pd.DataFrame(best_history),
+        pd.Series(y_train_tensor.numpy()),
+        pd.Series(best_train_probs),
         pd.Series(y_val_tensor.numpy()),
         pd.Series(best_probs),
         tuning_results,
