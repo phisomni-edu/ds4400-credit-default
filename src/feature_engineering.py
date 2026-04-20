@@ -1,4 +1,4 @@
-"""Feature engineering pipeline for producing processed train and test tables."""
+"""feature engineering pipeline for producing processed train and test tables"""
 
 import json
 from pathlib import Path

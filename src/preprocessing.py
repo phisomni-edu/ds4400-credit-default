@@ -1,4 +1,4 @@
-"""Build model-ready datasets from the processed feature tables."""
+"""build model-ready datasets from the processed feature tables"""
 
 import json
 from pathlib import Path

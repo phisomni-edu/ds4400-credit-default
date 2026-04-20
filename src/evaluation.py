@@ -1,4 +1,4 @@
-"""Evaluation helpers for fold-level model comparison."""
+"""evaluation helpers for fold-level model comparison"""
 
 import numpy as np
 import pandas as pd

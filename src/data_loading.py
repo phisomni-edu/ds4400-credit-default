@@ -1,4 +1,4 @@
-"""Data loading helpers for the Home Credit raw tables."""
+"""data loading helpers for the Home Credit raw tables"""
 
 from pathlib import Path
 
